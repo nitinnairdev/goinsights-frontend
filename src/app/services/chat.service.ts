@@ -2,9 +2,16 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
+export interface ChatMessage {
+  sender: 'user' | 'ace';
+  text: string;
+  data?: Record<string, any>[]; // Explicitly tells TS this is an array of objects
+  columns?: string[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class ChatService {
-  messages = signal<any[]>([]);
+  messages = signal<ChatMessage[]>([]);
   // Store the Geotab-provided chatId here
   private activeChatId = signal<string | null>(null);
   loading = signal(false);
@@ -37,7 +44,17 @@ export class ChatService {
 
           this.messages.update((m) => [
             ...m,
-            { sender: 'ace', text: res.text },
+            {
+              sender: 'ace',
+              // If text is empty, provide a fallback so the bubble isn't invisible
+              text:
+                res.text ||
+                (res.data?.length
+                  ? 'Here is the requested data:'
+                  : 'No data found'),
+              data: res.data,
+              columns: res.columns,
+            },
           ]);
           this.loading.set(false);
         },

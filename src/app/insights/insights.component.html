@@ -1,211 +1,115 @@
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-  <div class="bg-white border border-[#DDD] rounded flex flex-col">
-    <div class="p-4">
-      <h3 class="text-base font-medium">Safety</h3>
-    </div>
+@if (showError) {
+  <div
+    class="flex flex-col h-full w-full bg-white text-slate-600 overflow-hidden"
+  >
+    <div
+      class="flex-1 flex flex-col items-center justify-center p-6 text-center"
+    >
+      <div class="flex flex-col items-center gap-4 mt-24">
+        <img
+          src="./empty-state-insights.svg"
+          class="max-w-[200px] h-auto object-contain"
+          alt="Error state"
+        />
 
-    <div class="grid grid-cols-3 gap-4 h-32">
-      <div class="p-4 flex flex-col gap-2 items-center justify-center bg-white">
-        <span class="text-xs text-slate-500">Current (24 hrs)</span>
-        <span class="text-2xl font-light text-[#0078d3]">
-          {{ safetyInsights().current }}
+        <span class="text-sm text-slate-500 max-w-[240px] leading-relaxed">
+          Something went wrong. Please try again later.
         </span>
       </div>
-
-      <div class="p-4 flex flex-col gap-2 items-center justify-center bg-white">
-        <span class="text-xs text-slate-500">Average (30 d)</span>
-        <span class="text-2xl font-light text-[#0078d3]">
-          {{ safetyInsights().benchmark }}
-        </span>
-      </div>
-
-      <div class="p-4 flex flex-col gap-2 items-center justify-center bg-white">
-        <span class="text-xs text-slate-500">Change</span>
-        <span class="text-2xl font-light text-[#0078d3]">
-          {{ safetyInsights().delta }}%
-        </span>
-      </div>
-    </div>
-
-    <div class="flex flex-col gap-1 p-4 border-t border-[#EEE] mt-auto">
-      <span class="font-bold text-sm text-[#0078d3]">Insight:</span>
-      <span class="text-sm text-slate-500">{{
-        safetyInsights().aiSummary
-      }}</span>
     </div>
   </div>
+} @else {
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    @for (card of cards(); track card.id) {
+      <div class="bg-white border border-[#DDD] rounded flex flex-col w-full">
+        <div class="flex w-full flex-row justify-between items-center p-4 pb-0">
+          <h3 class="text-base font-medium">{{ card.title }}</h3>
 
-  <div class="bg-white border border-[#DDD] rounded flex flex-col">
-    <div class="p-4">
-      <h3 class="text-base font-medium">Trips</h3>
-    </div>
+          <button
+            class="text-xs text-[#0078d3] flex items-center gap-2 cursor-pointer hover:bg-slate-100 p-2 rounded transition-colors disabled:opacity-50"
+            [disabled]="card.loading"
+            (click)="fetchInsight(card.id)"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-sparkles"
+            >
+              <path
+                d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"
+              />
+              <path d="M20 2v4" />
+              <path d="M22 4h-4" />
+              <circle cx="4" cy="20" r="2" />
+            </svg>
+            Ask InsightsBot
+          </button>
+        </div>
 
-    <div class="grid grid-cols-3 gap-4 h-32">
-      <div class="p-4 flex flex-col gap-2 items-center justify-center bg-white">
-        <span class="text-xs text-slate-500">Current (24 hrs)</span>
-        <span class="text-2xl font-light text-[#0078d3]">
-          {{ tripInsights().current }}
-        </span>
+        @if (card.loading) {
+          <div
+            class="flex flex-row items-center justify-center h-32 animate-pulse p-4"
+          >
+            <div class="w-full h-24 bg-slate-200 rounded"></div>
+          </div>
+        } @else {
+          <div class="grid grid-cols-3 gap-4 h-32">
+            <div
+              class="p-4 flex flex-col gap-2 items-center justify-center bg-white"
+            >
+              <span class="text-xs text-slate-500">Current (24 hrs)</span>
+              <span class="text-2xl font-light text-[#0078d3]">{{
+                card.data.current
+              }}</span>
+            </div>
+
+            <div
+              class="p-4 flex flex-col gap-2 items-center justify-center bg-white"
+            >
+              <span class="text-xs text-slate-500">Average (30 d)</span>
+              <span class="text-2xl font-light text-[#0078d3]">{{
+                card.data.benchmark
+              }}</span>
+            </div>
+
+            <div
+              class="p-4 flex flex-col gap-2 items-center justify-center bg-white"
+            >
+              <span class="text-xs text-slate-500">Change</span>
+              <span
+                class="text-2xl font-light"
+                [ngClass]="
+                  card.data.delta > 0 ? 'text-red-600' : 'text-green-600'
+                "
+              >
+                {{ card.data.delta }}%
+              </span>
+            </div>
+          </div>
+        }
+
+        <div class="flex flex-col gap-1 p-4 border-t border-[#EEE] mt-auto">
+          <span class="font-bold text-sm text-[#0078d3]">Insight:</span>
+
+          @if (card.loading) {
+            <div class="animate-pulse mt-2">
+              <div class="w-full h-12 bg-slate-200 rounded"></div>
+            </div>
+          } @else {
+            <span
+              class="text-sm text-slate-500"
+              [innerHTML]="card.data.aiSummary"
+            ></span>
+          }
+        </div>
       </div>
-
-      <div class="p-4 flex flex-col gap-2 items-center justify-center bg-white">
-        <span class="text-xs text-slate-500">Average (30 d)</span>
-        <span class="text-2xl font-light text-[#0078d3]">
-          {{ tripInsights().benchmark }}
-        </span>
-      </div>
-
-      <div class="p-4 flex flex-col gap-2 items-center justify-center bg-white">
-        <span class="text-xs text-slate-500">Change</span>
-        <span class="text-2xl font-light text-[#0078d3]">
-          {{ tripInsights().delta }}%
-        </span>
-      </div>
-    </div>
-
-    <div class="flex flex-col gap-1 p-4 border-t border-[#EEE] mt-auto">
-      <span class="font-bold text-sm text-[#0078d3]">Insight:</span>
-      <span class="text-sm text-slate-500">{{ tripInsights().aiSummary }}</span>
-    </div>
+    }
   </div>
-
-  <div class="bg-white border border-[#DDD] rounded flex flex-col">
-    <div class="p-4">
-      <h3 class="text-base font-medium">Fuel</h3>
-    </div>
-
-    <div class="grid grid-cols-3 gap-4 h-32">
-      <div class="p-4 flex flex-col gap-2 items-center justify-center bg-white">
-        <span class="text-xs text-slate-500">Current (24 hrs)</span>
-        <span class="text-2xl font-light text-[#0078d3]">
-          {{ fuelInsights().current }}
-        </span>
-      </div>
-
-      <div class="p-4 flex flex-col gap-2 items-center justify-center bg-white">
-        <span class="text-xs text-slate-500">Average (30 d)</span>
-        <span class="text-2xl font-light text-[#0078d3]">
-          {{ fuelInsights().benchmark }}
-        </span>
-      </div>
-
-      <div class="p-4 flex flex-col gap-2 items-center justify-center bg-white">
-        <span class="text-xs text-slate-500">Change</span>
-        <span class="text-2xl font-light text-[#0078d3]">
-          {{ fuelInsights().delta }}%
-        </span>
-      </div>
-    </div>
-
-    <div class="flex flex-col gap-1 p-4 border-t border-[#EEE] mt-auto">
-      <span class="font-bold text-sm text-[#0078d3]">Insight:</span>
-      <span class="text-sm text-slate-500">{{ fuelInsights().aiSummary }}</span>
-    </div>
-  </div>
-
-  <div class="bg-white border border-[#DDD] rounded flex flex-col">
-    <div class="p-4">
-      <h3 class="text-base font-medium">HOS</h3>
-    </div>
-
-    <div class="grid grid-cols-3 gap-4 h-32">
-      <div class="p-4 flex flex-col gap-2 items-center justify-center bg-white">
-        <span class="text-xs text-slate-500">Current (24 hrs)</span>
-        <span class="text-2xl font-light text-[#0078d3]">
-          {{ hOSInsights().current }}
-        </span>
-      </div>
-
-      <div class="p-4 flex flex-col gap-2 items-center justify-center bg-white">
-        <span class="text-xs text-slate-500">Average (30 d)</span>
-        <span class="text-2xl font-light text-[#0078d3]">
-          {{ hOSInsights().benchmark }}
-        </span>
-      </div>
-
-      <div class="p-4 flex flex-col gap-2 items-center justify-center bg-white">
-        <span class="text-xs text-slate-500">Change</span>
-        <span class="text-2xl font-light text-[#0078d3]">
-          {{ hOSInsights().delta }}%
-        </span>
-      </div>
-    </div>
-
-    <div class="flex flex-col gap-1 p-4 border-t border-[#EEE] mt-auto">
-      <span class="font-bold text-sm text-[#0078d3]">Insight:</span>
-      <span class="text-sm text-slate-500">{{ hOSInsights().aiSummary }}</span>
-    </div>
-  </div>
-
-  <div class="bg-white border border-[#DDD] rounded flex flex-col">
-    <div class="p-4">
-      <h3 class="text-base font-medium">Idiling</h3>
-    </div>
-
-    <div class="grid grid-cols-3 gap-4 h-32">
-      <div class="p-4 flex flex-col gap-2 items-center justify-center bg-white">
-        <span class="text-xs text-slate-500">Current (24 hrs)</span>
-        <span class="text-2xl font-light text-[#0078d3]">
-          {{ idilingInsights().current }}
-        </span>
-      </div>
-
-      <div class="p-4 flex flex-col gap-2 items-center justify-center bg-white">
-        <span class="text-xs text-slate-500">Average (30 d)</span>
-        <span class="text-2xl font-light text-[#0078d3]">
-          {{ idilingInsights().benchmark }}
-        </span>
-      </div>
-
-      <div class="p-4 flex flex-col gap-2 items-center justify-center bg-white">
-        <span class="text-xs text-slate-500">Change</span>
-        <span class="text-2xl font-light text-[#0078d3]">
-          {{ idilingInsights().delta }}%
-        </span>
-      </div>
-    </div>
-
-    <div class="flex flex-col gap-1 p-4 border-t border-[#EEE] mt-auto">
-      <span class="font-bold text-sm text-[#0078d3]">Insight:</span>
-      <span class="text-sm text-slate-500">{{
-        idilingInsights().aiSummary
-      }}</span>
-    </div>
-  </div>
-
-  <div class="bg-white border border-[#DDD] rounded flex flex-col">
-    <div class="p-4">
-      <h3 class="text-base font-medium">Faults</h3>
-    </div>
-
-    <div class="grid grid-cols-3 gap-4 h-32">
-      <div class="p-4 flex flex-col gap-2 items-center justify-center bg-white">
-        <span class="text-xs text-slate-500">Current (24 hrs)</span>
-        <span class="text-2xl font-light text-[#0078d3]">
-          {{ faultInsights().current }}
-        </span>
-      </div>
-
-      <div class="p-4 flex flex-col gap-2 items-center justify-center bg-white">
-        <span class="text-xs text-slate-500">Average (30 d)</span>
-        <span class="text-2xl font-light text-[#0078d3]">
-          {{ faultInsights().benchmark }}
-        </span>
-      </div>
-
-      <div class="p-4 flex flex-col gap-2 items-center justify-center bg-white">
-        <span class="text-xs text-slate-500">Change</span>
-        <span class="text-2xl font-light text-[#0078d3]">
-          {{ faultInsights().delta }}%
-        </span>
-      </div>
-    </div>
-
-    <div class="flex flex-col gap-1 p-4 border-t border-[#EEE] mt-auto">
-      <span class="font-bold text-sm text-[#0078d3]">Insight:</span>
-      <span class="text-sm text-slate-500">{{
-        faultInsights().aiSummary
-      }}</span>
-    </div>
-  </div>
-</div>
+}

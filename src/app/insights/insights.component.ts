@@ -1,6 +1,13 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { InsightsService, InsightData } from '../services/insights.service';
 import { CommonModule } from '@angular/common';
+
+interface InsightCard {
+  id: string;
+  title: string;
+  data: InsightData;
+  loading: boolean;
+}
 
 const defaultInsightData: InsightData = {
   current: 0,
@@ -11,61 +18,49 @@ const defaultInsightData: InsightData = {
 
 @Component({
   selector: 'app-insights',
+  standalone: true, // Assuming standalone based on imports
   imports: [CommonModule],
   templateUrl: './insights.component.html',
   styleUrl: './insights.component.scss',
 })
 export class InsightsComponent implements OnInit {
   private service = inject(InsightsService);
-  safetyInsights = signal<InsightData>(defaultInsightData);
-  tripInsights = signal<InsightData>(defaultInsightData);
-  idilingInsights = signal<InsightData>(defaultInsightData);
-  faultInsights = signal<InsightData>(defaultInsightData);
-  fuelInsights = signal<InsightData>(defaultInsightData);
-  hOSInsights = signal<InsightData>(defaultInsightData);
+  public showError = false;
+  // Use an array of signals to keep track of cards
+  cards = signal<InsightCard[]>([
+    { id: 'safety', title: 'Safety', data: defaultInsightData, loading: false },
+    { id: 'trips', title: 'Trips', data: defaultInsightData, loading: false },
+    { id: 'fuel', title: 'Fuel', data: defaultInsightData, loading: false },
+    { id: 'hos', title: 'HOS', data: defaultInsightData, loading: false },
+    { id: 'idling', title: 'Idling', data: defaultInsightData, loading: false },
+    { id: 'faults', title: 'Faults', data: defaultInsightData, loading: false },
+  ]);
 
   ngOnInit() {
-    this.getSafetyInsights();
-    this.getTripInsights();
-    this.getIdilingInsights();
-    this.getFaultInsights();
-    this.getFuelInsights();
-    this.getHOSInsights();
+    // Initialize all cards
+    this.cards().forEach((card) => this.fetchInsight(card.id));
   }
 
-  getSafetyInsights() {
-    this.service.getInsightsByCategory('safety').subscribe((data) => {
-      this.safetyInsights.set(data);
+  fetchInsight(id: string) {
+    // Set individual card loading to true
+    this.showError = false;
+    this.updateCardState(id, { loading: true });
+
+    this.service.getInsightsByCategory(id).subscribe({
+      next: (data) => {
+        this.updateCardState(id, { data, loading: false });
+      },
+      error: () => {
+        this.showError = true;
+        this.updateCardState(id, { loading: false });
+      },
     });
   }
 
-  getTripInsights() {
-    this.service.getInsightsByCategory('trips').subscribe((data) => {
-      this.tripInsights.set(data);
-    });
-  }
-
-  getIdilingInsights() {
-    this.service.getInsightsByCategory('idling').subscribe((data) => {
-      this.idilingInsights.set(data);
-    });
-  }
-
-  getFaultInsights() {
-    this.service.getInsightsByCategory('faults').subscribe((data) => {
-      this.faultInsights.set(data);
-    });
-  }
-
-  getFuelInsights() {
-    this.service.getInsightsByCategory('fuel').subscribe((data) => {
-      this.fuelInsights.set(data);
-    });
-  }
-
-  getHOSInsights() {
-    this.service.getInsightsByCategory('hos').subscribe((data) => {
-      this.hOSInsights.set(data);
-    });
+  // Helper to update a single item in the signal array
+  private updateCardState(id: string, patch: Partial<InsightCard>) {
+    this.cards.update((cards) =>
+      cards.map((c) => (c.id === id ? { ...c, ...patch } : c)),
+    );
   }
 }

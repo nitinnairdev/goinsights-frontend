@@ -1,49 +1,132 @@
 <div
   class="flex flex-col h-screen max-h-screen justify-between bg-white text-slate-600"
 >
-  <div class="h-14 flex items-center px-6 border-b border-[#E1E1E1]">
-    <div class="flex flex-col items-start gap-1">
-      <h3 class="font-light text-xl text-slate-600">InsightBot</h3>
+  <div class="h-14 w-full flex px-6 border-b border-[#E1E1E1]">
+    <div class="flex w-full flex-row items-center justify-between gap-1">
+      <h3 class="font-light text-xl text-slate-600 flex flex-row items-center">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#0078d3"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="lucide lucide-sparkles"
+        >
+          <path
+            d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"
+          />
+          <path d="M20 2v4" />
+          <path d="M22 4h-4" />
+          <circle cx="4" cy="20" r="2" />
+        </svg>
+
+        <span class="ml-2">InsightsBot</span>
+      </h3>
+      <button
+        class="text-xs text-[#0078d3] border border-[#0078d3] px-2 py-1 rounded cursor-pointer"
+        (click)="chatService.startNewChat()"
+      >
+        New Chat
+      </button>
     </div>
   </div>
-  <div class="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth min-h-0">
-    @for (msg of chatService.messages(); track $index) {
-      <div
-        [class]="
-          msg.sender === 'user' ? 'flex justify-end' : 'flex justify-start'
-        "
-      >
+
+  @if (chatService.messages().length === 0) {
+    <div
+      class="flex-1 flex items-center justify-center overflow-y-auto p-4 space-y-4 scroll-smooth min-h-0"
+    >
+      <div class="flex flex-col items-center gap-2">
+        <img src="./empty-state-chat.svg" class="object-cover" />
+        <span class="text-sm text-slate-500 max-w-xs text-center"
+          >Ask a question to get more information on your fleet's insights</span
+        >
+      </div>
+    </div>
+  } @else {
+    <div class="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth min-h-0">
+      @for (msg of chatService.messages(); track $index) {
         <div
           [class]="
-            msg.sender === 'user'
-              ? 'bg-[#0078d3] text-white rounded rounded-tr-none'
-              : 'text-slate-600 border border-[#E1E1E1] rounded rounded-tl-none text-slate-600'
+            msg.sender === 'user' ? 'flex justify-end' : 'flex justify-start'
           "
-          class="max-w-[88%] px-3 py-2 text-[13px] leading-normal whitespace-pre-wrap"
         >
-          {{ msg.text }}
-        </div>
-      </div>
-    }
+          <div
+            [class]="
+              msg.sender === 'user'
+                ? 'bg-[#0078d3] text-white rounded rounded-tr-none'
+                : 'text-slate-500 border border-[#E1E1E1] rounded rounded-tl-none'
+            "
+            class="max-w-[88%] px-3 py-2 text-sm leading-normal whitespace-pre-wrap"
+          >
+            <div>{{ msg.text }}</div>
 
-    @if (chatService.loading()) {
-      <div class="flex justify-start">
-        <div
-          class="text-slate-600 border border-[#E1E1E1] rounded rounded-tl-none px-3 py-2 border border-[#E1E1E1] space-x-1 flex"
-        >
-          <div
-            class="w-1.5 h-1.5 bg-[#999999] rounded-full animate-bounce"
-          ></div>
-          <div
-            class="w-1.5 h-1.5 bg-[#999999] rounded-full animate-bounce [animation-delay:-0.15s]"
-          ></div>
-          <div
-            class="w-1.5 h-1.5 bg-[#999999] rounded-full animate-bounce [animation-delay:-0.3s]"
-          ></div>
+            @if (msg.data && msg.data.length > 0) {
+              <div
+                class="mt-3 overflow-x-auto border border-[#DCDCDC] rounded bg-white text-slate-700"
+              >
+                <table class="w-full text-left border-collapse text-[11px]">
+                  <thead class="bg-slate-50 border-b border-[#DCDCDC]">
+                    <tr>
+                      @for (
+                        col of msg.data[0] | keyvalue: keepOrder;
+                        track col.key
+                      ) {
+                        <th
+                          class="px-2 py-1.5 font-bold text-slate-600 border-r last:border-r-0 border-[#DCDCDC]"
+                        >
+                          {{ col.key.replace("_", " ") }}
+                        </th>
+                      }
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (row of msg.data; track $index) {
+                      <tr
+                        class="border-b border-[#EEEEEE] last:border-b-0 hover:bg-slate-50"
+                      >
+                        @for (
+                          cell of row | keyvalue: keepOrder;
+                          track cell.key
+                        ) {
+                          <td
+                            class="px-2 py-1.5 border-r last:border-r-0 border-[#EEEEEE]"
+                          >
+                            {{ cell.value }}
+                          </td>
+                        }
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          </div>
         </div>
-      </div>
-    }
-  </div>
+      }
+
+      @if (chatService.loading()) {
+        <div class="flex justify-start">
+          <div
+            class="text-slate-600 border border-slate-200 rounded rounded-tl-none px-3 py-4 space-x-1 flex"
+          >
+            <div
+              class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"
+            ></div>
+            <div
+              class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.15s]"
+            ></div>
+            <div
+              class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.3s]"
+            ></div>
+          </div>
+        </div>
+      }
+    </div>
+  }
 
   <div class="p-4 border-t border-[#E1E1E1] flex-none">
     @if (chatService.messages().length < 15) {
@@ -57,30 +140,39 @@
             chatInput.value = ''
           "
           placeholder="Ask a question..."
-          class="w-full border border-[#DCDCDC] rounded py-2.5 pl-3 pr-10 text-[13px] outline-none focus:border-[#25408F] transition-all placeholder:text-[#999999] resize-none overflow-y-auto max-h-[120px] leading-[1.5]"
+          class="w-full border border-[#DCDCDC] rounded py-2.5 pl-3 pr-10 text-sm outline-none focus:border-[#0078d3] transition-all placeholder:text-[#999999] resize-none overflow-y-auto max-h-[120px] leading-[1.5]"
         ></textarea>
 
         <button
           (click)="
             chatService.sendMessage(chatInput.value); chatInput.value = ''
           "
-          class="absolute right-2 bottom-2.5 text-[#25408F] hover:scale-110 transition-transform"
+          class="absolute right-2 bottom-2.5 text-[#0078d3] hover:scale-110 transition-transform cursor-pointer"
         >
-          <svg fill="currentColor" class="w-5 h-5" viewBox="0 0 24 24">
+          <svg fill="currentColor" class="w-6 h-6" viewBox="0 0 24 24">
             <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
           </svg>
         </button>
       </div>
       <p
-        class="text-[10px] text-[#999999] mt-2 text-center uppercase tracking-tighter"
+        class="text-xs text-[#999999] mt-2 text-center uppercase tracking-tighter"
       >
         {{ chatService.messages().length }} of 15 interactions
       </p>
     } @else {
-      <div
-        class="bg-amber-50 border border-amber-200 text-amber-800 text-[11px] p-2 text-center rounded font-bold"
-      >
-        CONVERSATION LIMIT REACHED
+      <div class="flex flex-col items-center gap-2">
+        <div
+          class="bg-amber-50 border border-amber-200 text-amber-800 text-xs p-2 text-center rounded font-bold"
+        >
+          Conversation limit reached
+        </div>
+
+        <button
+          class="text-xs text-[#0078d3] border border-[#0078d3] px-2 py-1 rounded cursor-pointer"
+          (click)="chatService.startNewChat()"
+        >
+          New Chat
+        </button>
       </div>
     }
   </div>
