@@ -1,30 +1,26 @@
 <div
-  class="flex h-screen w-full font-['Roboto',sans-serif] text-slate-600 overflow-hidden"
+  class="flex h-full w-full font-['Roboto',sans-serif] text-slate-600 overflow-hidden bg-white"
 >
   <div class="flex-1 flex flex-col min-w-0">
     <header
-      class="h-14 flex items-center px-6 bg-white border-b border-[#E1E1E1]"
+      class="h-14 flex items-center px-6 bg-white border-b border-[#E1E1E1] flex-none"
     >
-      <div class="flex flex-col items-start gap-1">
-        <h3 class="font-light text-xl text-slate-600">GoInsights</h3>
-      </div>
+      <h3 class="font-light text-xl text-slate-600">GoInsights</h3>
     </header>
 
-    <main class="flex-1 h-screen max-h-screen overflow-y-auto p-6">
+    <main class="flex-1 min-h-0 overflow-y-auto p-6">
       <div class="flex flex-col gap-4">
-        <div class="flex flex-row items-center justify-between">
-          <p class="text-sm text-slate-500">
-            Welcome to GoInsights, your daily fleet insights with AI assistant.
-          </p>
-        </div>
+        <p class="text-sm text-slate-500">
+          Welcome to GoInsights, your daily fleet insights with AI assistant.
+        </p>
         <app-insights></app-insights>
       </div>
     </main>
   </div>
 
-  <aside class="w-[400px] bg-white border-l border-[#DCDCDC] flex flex-col">
-    <div class="flex-1 overflow-hidden flex flex-col bg-white">
-      <app-chat></app-chat>
-    </div>
+  <aside
+    class="w-[400px] bg-white border-l border-[#DCDCDC] flex flex-col flex-none h-full"
+  >
+    <app-chat class="h-full"></app-chat>
   </aside>
 </div>

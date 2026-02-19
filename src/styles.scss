@@ -1,3 +1,18 @@
 * {
   font-family: "Roboto", sans-serif;
 }
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* Prevents the Geotab-level scrollbar */
+}
+
+app-root,
+app-insights,
+app-chat {
+  display: block;
+  height: 100%;
+}
