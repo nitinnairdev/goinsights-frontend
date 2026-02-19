@@ -11,7 +11,15 @@ export interface ChatMessage {
 
 @Injectable({ providedIn: 'root' })
 export class ChatService {
-  apiUrl = '/api/ace/chat';
+  private getBaseApiUrl(): string {
+    const isLocal = window.location.hostname === 'localhost';
+
+    // If local, return '/api' so proxy.conf.json works
+    // If in Geotab/Vercel, return the full Vercel URL to break out of Geotab
+    return isLocal ? '/api' : 'https://goinsights-frontend.vercel.app/api';
+  }
+
+  apiUrl = 'ace/chat';
   messages = signal<ChatMessage[]>([]);
   // Store the Geotab-provided chatId here
   private activeChatId = signal<string | null>(null);
@@ -32,7 +40,7 @@ export class ChatService {
     this.messages.update((m) => [...m, { sender: 'user', text: prompt }]);
 
     this.http
-      .post(this.apiUrl, {
+      .post(`${this.getBaseApiUrl()}/${this.apiUrl}`, {
         prompt,
         chatId: this.activeChatId(), // Send the ID we have (null for first message)
       })

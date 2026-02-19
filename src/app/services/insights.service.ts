@@ -13,10 +13,21 @@ export interface InsightData {
 @Injectable({ providedIn: 'root' })
 export class InsightsService {
   private http = inject(HttpClient);
-  private apiUrl = 'api/insights';
+
+  private getBaseApiUrl(): string {
+    const isLocal = window.location.hostname === 'localhost';
+
+    // If local, return '/api' so proxy.conf.json works
+    // If in Geotab/Vercel, return the full Vercel URL to break out of Geotab
+    return isLocal ? '/api' : 'https://goinsights-frontend.vercel.app/api';
+  }
+
+  private apiUrl = 'insights';
 
   // Fetch data for a specific category (e.g., 'fuel', 'trips', 'safety')
   getInsightsByCategory(category: string): Observable<InsightData> {
-    return this.http.get<InsightData>(`${this.apiUrl}/${category}`);
+    return this.http.get<InsightData>(
+      `${this.getBaseApiUrl()}/${this.apiUrl}/${category}`,
+    );
   }
 }
