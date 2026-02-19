@@ -19,12 +19,13 @@
     </div>
   </div>
 } @else {
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <div class="flex flex-wrap gap-6 w-full">
     @for (card of cards(); track card.id) {
-      <div class="bg-white border border-[#DDD] rounded flex flex-col w-full">
+      <div
+        class="bg-white border border-[#DDD] rounded flex flex-col w-full md:w-[calc(50%-12px)] min-w-[300px]"
+      >
         <div class="flex w-full flex-row justify-between items-center p-4 pb-0">
           <h3 class="text-base font-medium">{{ card.title }}</h3>
-
           <button
             class="text-xs text-[#0078d3] flex items-center gap-2 cursor-pointer hover:bg-slate-100 p-2 rounded transition-colors disabled:opacity-50"
             [disabled]="card.loading"
@@ -60,29 +61,33 @@
             <div class="w-full h-24 bg-slate-200 rounded"></div>
           </div>
         } @else {
-          <div class="grid grid-cols-3 gap-4 h-32">
+          <div class="flex flex-row h-32 border-b border-[#EEE]">
             <div
-              class="p-4 flex flex-col gap-2 items-center justify-center bg-white"
+              class="flex-1 p-4 flex flex-col gap-2 items-center justify-center bg-white border-r border-[#EEE]"
             >
-              <span class="text-xs text-slate-500">Current (24 hrs)</span>
+              <span class="text-xs text-slate-500 text-center"
+                >Current (24 hrs)</span
+              >
               <span class="text-2xl font-light text-[#0078d3]">{{
                 card.data.current
               }}</span>
             </div>
 
             <div
-              class="p-4 flex flex-col gap-2 items-center justify-center bg-white"
+              class="flex-1 p-4 flex flex-col gap-2 items-center justify-center bg-white border-r border-[#EEE]"
             >
-              <span class="text-xs text-slate-500">Average (30 d)</span>
+              <span class="text-xs text-slate-500 text-center"
+                >Average (30 d)</span
+              >
               <span class="text-2xl font-light text-[#0078d3]">{{
                 card.data.benchmark
               }}</span>
             </div>
 
             <div
-              class="p-4 flex flex-col gap-2 items-center justify-center bg-white"
+              class="flex-1 p-4 flex flex-col gap-2 items-center justify-center bg-white"
             >
-              <span class="text-xs text-slate-500">Change</span>
+              <span class="text-xs text-slate-500 text-center">Change</span>
               <span
                 class="text-2xl font-light"
                 [ngClass]="
@@ -97,9 +102,8 @@
           </div>
         }
 
-        <div class="flex flex-col gap-1 p-4 border-t border-[#EEE] mt-auto">
+        <div class="flex flex-col gap-1 p-4 mt-auto">
           <span class="font-bold text-sm text-[#0078d3]">Insight:</span>
-
           @if (card.loading) {
             <div class="animate-pulse mt-2">
               <div class="w-full h-12 bg-slate-200 rounded"></div>
