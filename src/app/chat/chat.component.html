@@ -78,7 +78,7 @@
                         <th
                           class="px-2 py-1.5 font-bold text-slate-600 border-r last:border-r-0 border-[#DCDCDC]"
                         >
-                          {{ col.key.replace("_", " ") }}
+                          {{ $any(col.key).split("_").join(" ") }}
                         </th>
                       }
                     </tr>
@@ -140,7 +140,7 @@
             chatInput.value = ''
           "
           placeholder="Ask a question..."
-          class="w-full border border-[#DCDCDC] rounded py-2.5 pl-3 pr-10 text-sm outline-none focus:border-[#0078d3] transition-all placeholder:text-[#999999] resize-none overflow-y-auto max-h-[120px] leading-[1.5]"
+          class="w-full border border-[#DCDCDC] rounded py-2.5 pl-3 pr-10 text-sm outline-none focus:border-[#0078d3] transition-all placeholder:text-slate-400 resize-none overflow-y-auto max-h-[120px] leading-[1.5]"
         ></textarea>
 
         <button
@@ -154,15 +154,14 @@
           </svg>
         </button>
       </div>
-      <p
-        class="text-xs text-[#999999] mt-2 text-center uppercase tracking-tighter"
-      >
-        {{ chatService.messages().length }} of 15 interactions
+      <p class="text-sm text-slate-400 mt-2 text-center tracking-tighter">
+        {{ chatService.messages().length }} of 15 interactions | Powered by
+        Geotab Ace
       </p>
     } @else {
       <div class="flex flex-col items-center gap-2">
         <div
-          class="bg-amber-50 border border-amber-200 text-amber-800 text-xs p-2 text-center rounded font-bold"
+          class="bg-amber-50 border border-amber-200 text-amber-800 text-sm p-2 text-center rounded font-bold"
         >
           Conversation limit reached
         </div>

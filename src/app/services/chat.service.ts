@@ -1,5 +1,5 @@
 // ace-chat.service.ts
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 export interface ChatMessage {
@@ -11,6 +11,7 @@ export interface ChatMessage {
 
 @Injectable({ providedIn: 'root' })
 export class ChatService {
+  apiUrl = '/api/ace/chat';
   messages = signal<ChatMessage[]>([]);
   // Store the Geotab-provided chatId here
   private activeChatId = signal<string | null>(null);
@@ -31,7 +32,7 @@ export class ChatService {
     this.messages.update((m) => [...m, { sender: 'user', text: prompt }]);
 
     this.http
-      .post('http://localhost:3000/api/ace/chat', {
+      .post(this.apiUrl, {
         prompt,
         chatId: this.activeChatId(), // Send the ID we have (null for first message)
       })

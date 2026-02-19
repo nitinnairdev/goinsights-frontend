@@ -28,7 +28,7 @@
           <button
             class="text-xs text-[#0078d3] flex items-center gap-2 cursor-pointer hover:bg-slate-100 p-2 rounded transition-colors disabled:opacity-50"
             [disabled]="card.loading"
-            (click)="fetchInsight(card.id)"
+            (click)="askAi(card)"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -86,7 +86,9 @@
               <span
                 class="text-2xl font-light"
                 [ngClass]="
-                  card.data.delta > 0 ? 'text-red-600' : 'text-green-600'
+                  card.data.delta > 0 && card.id === 'trips'
+                    ? 'text-green-600'
+                    : 'text-red-600'
                 "
               >
                 {{ card.data.delta }}%

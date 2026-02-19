@@ -13,7 +13,7 @@ export interface InsightData {
 @Injectable({ providedIn: 'root' })
 export class InsightsService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3000/api/insights';
+  private apiUrl = 'api/insights';
 
   // Fetch data for a specific category (e.g., 'fuel', 'trips', 'safety')
   getInsightsByCategory(category: string): Observable<InsightData> {

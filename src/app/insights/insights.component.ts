@@ -1,6 +1,7 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { InsightsService, InsightData } from '../services/insights.service';
 import { CommonModule } from '@angular/common';
+import { ChatService } from '../services/chat.service';
 
 interface InsightCard {
   id: string;
@@ -25,6 +26,7 @@ const defaultInsightData: InsightData = {
 })
 export class InsightsComponent implements OnInit {
   private service = inject(InsightsService);
+  private chatService = inject(ChatService);
   public showError = false;
   // Use an array of signals to keep track of cards
   cards = signal<InsightCard[]>([
@@ -37,7 +39,10 @@ export class InsightsComponent implements OnInit {
   ]);
 
   ngOnInit() {
-    // Initialize all cards
+    this.reloadAllCards();
+  }
+
+  reloadAllCards() {
     this.cards().forEach((card) => this.fetchInsight(card.id));
   }
 
@@ -62,5 +67,19 @@ export class InsightsComponent implements OnInit {
     this.cards.update((cards) =>
       cards.map((c) => (c.id === id ? { ...c, ...patch } : c)),
     );
+  }
+
+  askAi(card: InsightCard) {
+    // Define mapping for specific categories to target the right Geotab entities
+    const categorySpecificsPrompts: Record<string, string> = {
+      safety: 'How to improve the safety of the fleet?',
+      trips: 'How to increase the number of trips?',
+      fuel: 'How to reduce the fuel consumption?',
+      hos: 'How to reduce the HOS violations?',
+      idling: 'How to reduce the idle time?',
+      faults: 'How to reduce the engine fault codes?',
+    };
+
+    this.chatService.sendMessage(categorySpecificsPrompts[card.id]);
   }
 }
