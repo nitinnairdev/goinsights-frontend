@@ -1,59 +1,67 @@
-# GoinsightsFrontend
+# 🏗️ GoInsights Frontend Architecture
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.9.
+The **GoInsights frontend** is a specialized Geotab Add-In built to serve as a unified intelligence layer. It is architected to handle complex data visualization and real-time AI interaction within the constrained environment of a MyGeotab Iframe.
 
-## Development server
+---
 
-To start a local development server, run:
+## 🏛️ Technical Stack
 
-```bash
-ng serve
-```
+- **Core:** Angular v21 (Standalone Architecture)  
+- **State Management:** RxJS `BehaviorSubjects` for real-time telemetry updates  
+- **Styling:** SCSS with Tailwind Flexbox/Grid for a responsive, "single-pane-of-glass" layout  
+- **Deployment:** Vercel 
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+---
 
-## Code scaffolding
+## 🧩 Architectural Components
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### 1️⃣ Geotab Integration Layer (The Bridge)
 
-```bash
-ng generate component component-name
-```
+**Add-in Lifecycle**  
+- Utilizes `geotab.addin.initialize` and `geotab.addin.focus`  
+- Maintains state sync with the MyGeotab parent shell  
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+**Authentication**  
+- Captures and securely stores session credentials:
+  - Session ID  
+  - Server  
+  - Database  
+- Passes credentials to backend for authorized data fetching  
 
-```bash
-ng generate --help
-```
+---
 
-## Building
+### 2️⃣ The Dashboard Engine
 
-To build the project run:
+**Telemetry Cards**  
+- Modular component architecture  
+- Each card (Trips, Safety, Fuel, Faults) operates as an independent subscriber to the telemetry stream  
 
-```bash
-ng build
-```
+**Insight Overlay**  
+- Abstraction layer mapping raw metrics to Google Gemini summary text  
+- Provides "Plain English" explanations of fleet performance deltas  
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+---
 
-## Running unit tests
+### 3️⃣ InsightsBot UI (Conversational Layer)
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+**Streaming Interface**  
+- Handles asynchronous AI responses  
+- Dynamically renders:
+  - Text  
+  - Structured data (tables)  
 
-```bash
-ng test
-```
+**Contextual Awareness**  
+- Sends current dashboard state (selected date range / vehicles) to backend  
+- Enables AI to respond with contextual intelligence  
 
-## Running end-to-end tests
+---
 
-For end-to-end (e2e) testing, run:
+## 🔄 Data Flow (Frontend)
 
-```bash
-ng e2e
-```
+1. **User Action:** Manager opens the Add-in  
+2. **Handshake:** Frontend requests session tokens from Geotab  
+3. **Aggregation:** Frontend calls the Railway Backend for fleet-wide summaries  
+4. **Render:** Telemetry displayed alongside Gemini-generated insights  
+5. **Interaction:** User queries InsightsBot; frontend renders Markdown + dynamic data tables  
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+---
